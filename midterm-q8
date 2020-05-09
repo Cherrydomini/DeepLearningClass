@@ -1,7 +1,3 @@
-Part A:
-I brought in the dataset using scipy.io.mio.loadmat() and named is data. from there the data was split into two categories, 'images' and 'labels'. From there the data was split again into testing and training data and testing and training labels using the train_split_test function that made 20 percent of the dataset the testing data and the other 80 percent the training data.
-Part B:
-I took the mean subtraction and normalization of the data. The mean subtraction was done by finding the mean of the testing and training data and subtracting that from training and testing data. To normalize the data I took the standard deviation of the two sets of images and divided that by two sets of images after the main subtraction was done.
 #PART A
 from __future__ import absolute_import, division, print_function, unicode_literals
 from os.path import dirname, join as pjoin
@@ -42,136 +38,12 @@ model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
 #PART C, D, & Initialization, number of layers, and activation function
 model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="glorot_normal"))
 #PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
+model.add(tf.keras.layers.Dense(10, activation="softmax", activity_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4)))
 
 #PART E GRADIENT OPTIMIZATION TECHNIQUE
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metric=['accuracy'])
 
-model.fit(x_train, y_train, epochs = 10)
+model.fit(x_train, y_train, epochs = 10) 
 
 model.evaluate(x_test,  y_test, verbose=2)
 model.summary()
-
- 
- 
-
-Part C:
-part. i: The model was built using the keras framework, specifically the Sequential() model. i first build the model by creating a variable called model = tf.keras.model.Sequential(), and from there I add layers by using model.add. to initialize the glorot initializer, in the first Dense() layer i used the kernel_initializer and the "glorot_normal" initializer. Below are the loss results and model summary of the model using the glorot initializer
- 
- 
-
-
-part ii: like the glorot initializer, the He  initializer was accepted in to the keras API, so I only had to use its function name “he_normal” to use it in the model.
- 
-
-
-Part D:
-Exp.1: The first configuration of the network is with one hidden layer. That layer uses relu activation and He initialization. My choice to use the He initialization is that it seems to be an improvement on the Xavier initializer, as it has similar results for a normal neural network, but the deeper the network becomes it still maintains its performance. I will be using it for the remainder of the experiments. I choose this as it is the most common and simply configuration that I have seen being used.
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="he_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Exp. 2: I n the second experiment I increased the amount of layers to 10. This was an arbitrary number in that the average number of layers I saw being used for teaching purposes has been just 2-4, but now industry level neural networks number above 100, 10 seemed appropriate for the power that my computer has and seems sufficiently larger for comparison with the original neural network that was created. I also increased the number of nodes to 200 and unlike what I expected, the loss was higher than the original neural network with a loss of 1.30002, compared to the original neural network with a loss of .2270
-Final Epoch:
- 
-Model summary:
- 
-
-Part E:
-Exp.1: For this part of the experiment I went back to the original format of the neural network, which is a single hidden layer and the He initializer. Originally I used the ADAM optimization in the beginning since it is the most commonly used optimization function 
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="he_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Exp. 2: For the second experiement I choose the AdaDelta optimizer. The AdaDelta optimizer has a continual decay of the learning rate throughout the training which, in theory, helps in keeping the model from overfitting as the error reduces. The results show that. In training the loss was 1.2068, but in the testing the loss more than doubles to 2.4873. additionally I did find out that making sure to set the learning rate, and rho myself made the model perform better, as I redid the experiment with standard notation (model.compile(optimizer="Adadelta", loss='sparse_categorical_crossentropy', metric=['accuracy'])) and the loss for testing was even high at 3.8178 I assume these high loss rates are all due to the lack of time to converge as there are only 10 epochs in my experiment neural network
-
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="he_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(tf.keras.optimizers.Adadelta(learning_rate=0.001, rho=0.95, epsilon=1e-07, name="Adadelta"),
-              loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Exp. 3: For the 3rd experiment I used the RMSProp optimizer because it also seems to have a good algorithm with appropriate moving parts. The square of gradients has a moving average and the gradient is divided by the root of this average. In theory, it seems that the gradient will adapt to the error situation at each run of the neural network. The loss in the testing phase was 0.3542
-
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="he_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(tf.keras.optimizers.RMSprop(learning_rate=0.002, rho=0.87,  epsilon=1e-07, centered=False, name="RMSprop"), 
-    loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Part F:
-exp.1:for the first activation function I used the LeakyReLu activation function
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128,tf.keras.layers.LeakyReLU(alpha=0.3), kernel_initializer="glorot_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Exp. 2: PReLu
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128,tf.keras.layers.PReLU(
-    alpha_initializer="zeros", alpha_regularizer=None, alpha_constraint=None, shared_axes=None), kernel_initializer="glorot_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax",  activity_regularizer=regularizers.l1(l=.01)))
-
-#PART E GRADIENT OPTIMIZATION TECHNIQUE
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metric=['accuracy'])
-
- 
-
-Part G:
-Exp.1 I used the l1+l2 regularization in the activity regularizer for the first experiment
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="glorot_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax", activity_regularizer=regularizers.l2(1e-5)))
- 
-Exp.2 I used the l2 regularization for the activity regularizer in the second experiment
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-#PART C, D, & Initialization, number of layers, and activation function
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer="glorot_normal"))
-#PART G regularization techniques
-model.add(tf.keras.layers.Dense(10, activation="softmax", activity_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4)))
-
-
